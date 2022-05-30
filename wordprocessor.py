@@ -1,4 +1,3 @@
-from __future__ import print_function
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
