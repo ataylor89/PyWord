@@ -80,8 +80,16 @@ class WordProcessor(tk.Tk):
         tabid = self.notebook.select()
         if tabid and self.notebook.tab(tabid, "text") != 'Untitled':
             self.filemenu.entryconfig("Save", state="active")
+            self.colormenu.entryconfig("Select foreground", state="active")
+            self.colormenu.entryconfig("Select background", state="active")
+        elif tabid:
+            self.filemenu.entryconfig("Save", state="disabled")
+            self.colormenu.entryconfig("Select foreground", state="active")
+            self.colormenu.entryconfig("Select background", state="active")
         else:
             self.filemenu.entryconfig("Save", state="disabled")
+            self.colormenu.entryconfig("Select foreground", state="disabled")
+            self.colormenu.entryconfig("Select background", state="disabled")
 
     def handle_tab_changed(self, *args):
         self.refresh_menu_items()
