@@ -14,6 +14,14 @@ Configuration options like foreground color, background color, font family, font
 
 To enable Google Drive support, edit the wordprocessor.ini file and put True as a value for the drive_enabled key. To disable Google Drive support, edit the wordprocessor.ini file and put False as a value for the drive_enabled key.
 
+## Installing the Google Python dependencies
+
+We can install the Google Python dependencies with the command:
+
+      pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+More information about the Google Python API can be found [here](https://developers.google.com/drive/api/quickstart/python?hl=en_US).
+
 ## Creating a MacOS app
 
 We can create a MacOS app from the Python source code using [py2app](https://py2app.readthedocs.io/en/latest/index.html)
