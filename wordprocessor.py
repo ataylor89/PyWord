@@ -172,8 +172,8 @@ class WordProcessor(tk.Tk):
                         return True
                 
                 file_metadata = {
-                'name': 'WordProcessor',
-                'mimeType': 'application/vnd.google-apps.folder'
+                    'name': 'WordProcessor',
+                    'mimeType': 'application/vnd.google-apps.folder'
                 }
                 file = drive_service.files().create(body=file_metadata, fields='id').execute()
                 if file:
