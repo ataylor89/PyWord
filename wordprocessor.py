@@ -161,24 +161,25 @@ class WordProcessor(tk.Tk):
                 print(f'An error occurred: {error}')
 
     def setup_google_drive(self, foldername):
-        try:
-            drive_service = build('drive', 'v3', credentials=creds)
-            response = drive_service.files().list(q="mimeType='application/vnd.google-apps.folder' and name='WordProcessor'",
-                                                  spaces='drive',
-                                                  fields='files(id, name)').execute()
-            for folder in response.get('files', []):
-                if folder.get('name') == 'WordProcessor':
+        if drive_enabled:
+            try:
+                drive_service = build('drive', 'v3', credentials=creds)
+                response = drive_service.files().list(q="mimeType='application/vnd.google-apps.folder' and name='WordProcessor'",
+                                                    spaces='drive',
+                                                    fields='files(id, name)').execute()
+                for folder in response.get('files', []):
+                    if folder.get('name') == 'WordProcessor':
+                        return True
+                
+                file_metadata = {
+                'name': 'WordProcessor',
+                'mimeType': 'application/vnd.google-apps.folder'
+                }
+                file = drive_service.files().create(body=file_metadata, fields='id').execute()
+                if file:
                     return True
-            
-            file_metadata = {
-               'name': 'WordProcessor',
-               'mimeType': 'application/vnd.google-apps.folder'
-            }
-            file = drive_service.files().create(body=file_metadata, fields='id').execute()
-            if file:
-                return True
-        except HttpError as error:
-            print(f'An error occurred: {error}')
+            except HttpError as error:
+                print(f'An error occurred: {error}')
         return False
  
 if __name__ == '__main__':
