@@ -63,9 +63,7 @@ class WordProcessor(tk.Tk):
         self.refresh_menu_items()
         self.font = font.Font(family=fontfamily, size=fontsize)
         if drive_enabled:
-            setup = self.setup_google_drive('WordProcessor')
-            if setup:
-                print('Setup Google Drive')
+            self.setup_google_drive('WordProcessor')
 
     def new_file(self):
         text = tk.Text(self.notebook, fg=fgcolor, bg=bgcolor, font=self.font)
