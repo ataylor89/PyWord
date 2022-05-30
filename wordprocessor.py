@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-import os
 
 class WordProcessor(tk.Tk):
     def __init__(self):
@@ -27,7 +26,7 @@ class WordProcessor(tk.Tk):
         text = tk.Text(self.notebook)
         self.notebook.add(text, text='Untitled')
         self.notebook.select(self.notebook.tabs()[-1])
-        self.handle_tab_changed()
+        self.refresh_menu_items()
 
     def open_file(self):
         filename = filedialog.askopenfilename()
@@ -38,7 +37,7 @@ class WordProcessor(tk.Tk):
             contents = f.read()
             text.insert('1.0', contents)
         self.notebook.select(self.notebook.tabs()[-1])
-        self.handle_tab_changed()
+        self.refresh_menu_items()
 
     def save_file(self):
         tabid = self.notebook.select()
@@ -54,6 +53,7 @@ class WordProcessor(tk.Tk):
         if filename:
             self.notebook.tab(tabid, text=filename)
             self.save_file()
+            self.refresh_menu_items()
 
     def close_tab(self):
         self.notebook.forget("current")
