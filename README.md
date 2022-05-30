@@ -20,7 +20,7 @@ We can install the Google Python dependencies with the command:
 
       pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
-More information about the Google Python API can be found [here](https://developers.google.com/drive/api/quickstart/python?hl=en_US).
+More information about the Google Drive Python API can be found [here](https://developers.google.com/drive/api/quickstart/python?hl=en_US).
 
 ## Creating a MacOS app
 
