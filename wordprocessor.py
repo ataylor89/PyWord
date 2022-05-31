@@ -3,8 +3,8 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import colorchooser
 from tkinter import font
-import configparser
 import os
+import configparser
 import logging
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -115,15 +115,11 @@ class WordProcessor(tk.Tk):
 
     def open_file(self):
         filename = filedialog.askopenfilename()
-        # logger.info('Opening file %s' %filename)
         text = tk.Text(self.notebook, fg=fgcolor, bg=bgcolor, font=self.font)
         text.pack(expand=True, fill='both')
         self.notebook.add(text, text=filename)
-        # logger.info('Added %s to notebook' %filename)
         with open(filename, mode='r', encoding='utf-8') as f:
-            # logger.info('Reading contents from %s' %filename)
             contents = f.read()
-            # logger.info('File contents: %s' %contents)
             text.insert('1.0', contents)
         self.notebook.select(self.notebook.tabs()[-1])
         self.refresh_menu_items()
