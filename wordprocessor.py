@@ -20,9 +20,11 @@ fontfamily = config.get('DEFAULT', 'font_family', fallback='Courier New')
 fontsize = config.getint('DEFAULT', 'font_size', fallback=14)
 drive_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
+# Setup Google Drive support
+drive_service = None
+drive_folder_id = None
 creds = None
-
+SCOPES = ['https://www.googleapis.com/auth/drive']
 if drive_enabled:
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
@@ -34,6 +36,21 @@ if drive_enabled:
             creds = flow.run_local_server(port=0)
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
+    try:
+        drive_service = build('drive', 'v3', credentials=creds)
+        queryString = "mimeType='application/vnd.google-apps.folder' and name='WordProcessor'"
+        response = drive_service.files().list(q=queryString, spaces='drive', fields='files(id, name)').execute()
+        for folder in response.get('files', []):
+            if folder.get('name') == 'WordProcessor':
+                drive_folder_id = folder.get('id')
+                break
+        if not drive_folder_id:             
+            file_metadata = {'name': 'WordProcessor', 'mimeType': 'application/vnd.google-apps.folder'}
+            folder = drive_service.files().create(body=file_metadata, fields='id').execute()
+            if folder:
+                drive_folder_id = folder.get('id')
+    except HttpError as error:
+        print(f'An error occurred: {error}')
 
 class WordProcessor(tk.Tk):
     def __init__(self):
@@ -62,8 +79,6 @@ class WordProcessor(tk.Tk):
         self.notebook.bind('<<NotebookTabChanged>>', self.handle_tab_changed)
         self.refresh_menu_items()
         self.font = font.Font(family=fontfamily, size=fontsize)
-        if drive_enabled:
-            self.setup_google_drive('WordProcessor')
 
     def new_file(self):
         text = tk.Text(self.notebook, fg=fgcolor, bg=bgcolor, font=self.font)
@@ -142,39 +157,14 @@ class WordProcessor(tk.Tk):
             tabid = self.notebook.select()
             filename = self.notebook.tab(tabid, "text")
             basename = os.path.basename(filename)
-            try:
-                drive_service = build('drive', 'v3', credentials=creds)
-                response = drive_service.files().list(q="mimeType='application/vnd.google-apps.folder' and name='WordProcessor'",
-                                                    spaces='drive',
-                                                    fields='files(id, name)').execute()
-                for folder in response.get('files', []):
-                    if folder.get('name') == 'WordProcessor':
-                        folderid = folder.get('id')                        
-                        file_metadata = {'name': basename, 'parents': [folderid]}
-                        media = MediaFileUpload(filename, mimetype='text/plain')
-                        file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-                        if file:
-                            print('Saved %s to the WordProcessor folder in Google Drive' %filename)
-            except HttpError as error:
-                print(f'An error occurred: {error}')
-
-    def setup_google_drive(self, foldername):
-        if drive_enabled:
-            try:
-                drive_service = build('drive', 'v3', credentials=creds)
-                response = drive_service.files().list(q="mimeType='application/vnd.google-apps.folder' and name='WordProcessor'",
-                                                    spaces='drive',
-                                                    fields='files(id, name)').execute()
-                for folder in response.get('files', []):
-                    if folder.get('name') == 'WordProcessor':
-                        return True               
-                file_metadata = {'name': 'WordProcessor', 'mimeType': 'application/vnd.google-apps.folder'}
-                file = drive_service.files().create(body=file_metadata, fields='id').execute()
+            try:                                     
+                file_metadata = {'name': basename, 'parents': [drive_folder_id]}
+                media = MediaFileUpload(filename, mimetype='text/plain')
+                file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
                 if file:
-                    return True
+                    print('Saved %s to the WordProcessor folder in Google Drive' %filename)
             except HttpError as error:
                 print(f'An error occurred: {error}')
-        return False
  
 if __name__ == '__main__':
     app = WordProcessor()
