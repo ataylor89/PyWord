@@ -167,9 +167,9 @@ class WordProcessor(tk.Tk):
                 else:                                
                     file_metadata = {'name': basename, 'parents': [drive_folder_id]}
                     media = MediaFileUpload(filename, mimetype='text/plain')
-                    file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    file = drive_service.files().create(body=file_metadata, media_body=media).execute()
                     if file:
-                        print('Saved %s to the WordProcessor folder in Google Drive' %filename)
+                        print('Saved %s to the WordProcessor folder on Google Drive' %filename)
             except HttpError as error:
                 print(f'An error occurred: {error}')
 
@@ -180,7 +180,6 @@ class WordProcessor(tk.Tk):
                 response = drive_service.files().list(q=queryString, spaces='drive', fields='files(id, name)').execute()
                 for file in response.get('files', []):
                     if file.get('name') == filename:
-                        print('Found file %s (file ID %s)' %(filename, file.get('id')))
                         return file.get('id')
             except HttpError as error:
                 print(f'An error occurred: {error}')
