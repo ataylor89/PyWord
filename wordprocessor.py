@@ -5,6 +5,7 @@ from tkinter import colorchooser
 from tkinter import font
 import configparser
 import os
+import logging
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,6 +13,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
+# Get configuration options from file
 config = configparser.ConfigParser()
 config.read('wordprocessor.ini')
 fgcolor = config.get('DEFAULT', 'foreground_color', fallback='#ffffff')
@@ -19,6 +21,31 @@ bgcolor = config.get('DEFAULT', 'background_color', fallback='#0099ff')
 fontfamily = config.get('DEFAULT', 'font_family', fallback='Courier New')
 fontsize = config.getint('DEFAULT', 'font_size', fallback=14)
 drive_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
+
+# Setup logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s;%(module)s;%(funcName)s;%(levelname)s;%(message)s")
+logger.propagate = False
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+HOME_DIR = os.environ['HOME']
+LOG_DIR = HOME_DIR + '/Logs'
+LOG_FILE = LOG_DIR + '/pyword.log'
+try:
+    if not os.path.exists(LOG_DIR):
+        os.makedirs(LOG_DIR)
+    fh = logging.FileHandler(LOG_FILE)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+except OSError as error:
+    logger.error(f'An error occurred: {error}')
+except:
+    logger.error('Error creating log file')
+logger.info("Setup logging")
 
 # Setup Google Drive support
 drive_service = None
@@ -50,7 +77,7 @@ if drive_enabled:
             if folder:
                 drive_folder_id = folder.get('id')
     except HttpError as error:
-        print(f'An error occurred: {error}')
+        logger.error(f'An error occurred: {error}')
 
 class WordProcessor(tk.Tk):
     def __init__(self):
@@ -88,11 +115,15 @@ class WordProcessor(tk.Tk):
 
     def open_file(self):
         filename = filedialog.askopenfilename()
+        # logger.info('Opening file %s' %filename)
         text = tk.Text(self.notebook, fg=fgcolor, bg=bgcolor, font=self.font)
         text.pack(expand=True, fill='both')
         self.notebook.add(text, text=filename)
-        with open(filename, 'r') as f:
+        # logger.info('Added %s to notebook' %filename)
+        with open(filename, mode='r', encoding='utf-8') as f:
+            # logger.info('Reading contents from %s' %filename)
             contents = f.read()
+            # logger.info('File contents: %s' %contents)
             text.insert('1.0', contents)
         self.notebook.select(self.notebook.tabs()[-1])
         self.refresh_menu_items()
@@ -102,7 +133,7 @@ class WordProcessor(tk.Tk):
         filename = self.notebook.tab(tabid, "text")
         text = self.notebook.nametowidget(tabid)
         contents = text.get('1.0', 'end')
-        with open(filename, 'w') as f:
+        with open(filename, mode='w', encoding='utf-8') as f:
             f.write(contents)
 
     def save_file_as(self):
@@ -163,15 +194,15 @@ class WordProcessor(tk.Tk):
                     media = MediaFileUpload(filename, mimetype='text/plain')
                     file = drive_service.files().update(fileId=file_id, media_body=media).execute()
                     if file:
-                        print('Updated %s in the WordProcessor folder on Google Drive' %filename)
+                        logger.info('Updated %s in the WordProcessor folder on Google Drive' %filename)
                 else:                                
                     file_metadata = {'name': basename, 'parents': [drive_folder_id]}
                     media = MediaFileUpload(filename, mimetype='text/plain')
                     file = drive_service.files().create(body=file_metadata, media_body=media).execute()
                     if file:
-                        print('Saved %s to the WordProcessor folder on Google Drive' %filename)
+                        logger.info('Saved %s to the WordProcessor folder on Google Drive' %filename)
             except HttpError as error:
-                print(f'An error occurred: {error}')
+                logger.error(f'An error occurred: {error}')
 
     def search_file_on_drive(self, filename):
         if drive_enabled:
@@ -182,7 +213,7 @@ class WordProcessor(tk.Tk):
                     if file.get('name') == filename:
                         return file.get('id')
             except HttpError as error:
-                print(f'An error occurred: {error}')
+                logger.error(f'An error occurred: {error}')
         return None
  
 if __name__ == '__main__':
