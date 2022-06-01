@@ -65,7 +65,7 @@ Tkinter is the default graphical toolkit for Python. It works by embedding a Tcl
 The Tkinter commands (written in Python) are translated into Tcl commands and then interpreted by the Tcl interpreter.
 The Tk library (and the Tkinter Python binding) allow for easy and rapid development of graphical user interfaces.
 
-## Graphical layout
+## Graphical layout and event handling
 
 Tk interfaces often use a grid layout. The grid layout consists of cells, and each cell has coordinates
 given by a row and a column. 
