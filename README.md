@@ -94,5 +94,5 @@ The method handle_tab_changed is registered to handle the TabChangedEvent.
 
 The menu items also generate events when they are clicked. We register methods to handle these events as well.
 
-The ttk.Notebook.bind method registers an event handler for an event. 
+The ttk.Notebook.bind method registers an event handler for a notebook-related event (like TabChangedEvent). 
 The tk.Menu.add_command method registers an event handler for when a menu (or menu item) is clicked.
