@@ -67,7 +67,7 @@ The Tk library (and the Tkinter Python binding) allow for easy and rapid develop
 
 ## Graphical layout
 
-Normally Tk interfaces use a grid layout. The grid layout consists of cells, and each cell has coordinates
+Tk interfaces often use a grid layout. The grid layout consists of cells, and each cell has coordinates
 given by a row and a column. 
 
 Our Tk window has a notebook (ttk.Notebook) and a menubar (tk.Menu). 
