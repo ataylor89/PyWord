@@ -64,3 +64,36 @@ Early on a Python binding for Tk was developed. The Python binding is called Tki
 Tkinter is the default graphical toolkit for Python. It works by embedding a Tcl interpreter into the Python application.
 The Tkinter commands (written in Python) are translated into Tcl commands and then interpreted by the Tcl interpreter.
 The Tk library (and the Tkinter Python binding) allow for easy and rapid development of graphical user interfaces.
+
+## Graphical layout
+
+Normally Tk interfaces use a grid layout. The grid layout consists of cells, and each cell has coordinates
+described by a row and a column. 
+
+Our Tk window has a notebook (ttk.Notebook) and a menubar (tk.Menu). 
+There is no need to specify which cells these components belong to, since the notebook takes up one cell
+and the menubar has a pre-defined position.
+
+We add the notebook and the menubar to our Tk window with the pack() method.
+
+The WordProcessor class subclasses the Tk class. The Tk class defines the main window of our GUI.
+
+Thus we add the ttk.Notebook object and the tk.Menu object to our WordProcessor instance.
+
+You can see that Tk makes use of object-oriented programming. 
+Many graphical toolkits make use of object-oriented programming, since it is very natural to describe
+a graphical component as an object (which has state and behavior).
+
+Our ttk.Notebook object contains instances of tk.Text. (The words instance and object are synonyms.)
+
+Our ttk.Notebook object allows for multiple text areas which can be navigated by means of tabs. 
+The ttk.Notebook object creates a new tab for every child it contains.
+
+The event loop started by app.mainloop listens for mouse clicks, and when the mouse clicks on a tab
+it creates a TabbedChangedEvent, which we listen for in the code. 
+The method handle_tab_changed is registered to handle the TabChangedEvent.
+
+The menu items also generate events when they are clicked. We register methods to handle these events as well.
+
+The ttk.Notebook.bind method registers an event handler for an event. 
+The tk.Menu.add_command method registers an event handler for when a menu (or menu item) is clicked.
