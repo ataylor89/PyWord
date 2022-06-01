@@ -55,3 +55,12 @@ After running the setup.py script, you should see a build and a dist folder in y
 Open Finder, navigate to your working directory, and click on the dist folder. Then, double click the wordprocessor.app file. The application should open. Once the application launches and is placed inside your dock, you can right-click the icon, select options, and select "Keep in dock".
 
 The WordProcessor application should now be successfully installed on your hard disk and on your dock.
+
+## The history of Tk
+
+Tk (toolkit) is a graphical tool kit that was created in 1988. 
+Tk was originally designed as an extension to the Tcl programming language, providing Tcl with a graphical toolkit. 
+Early on a Python binding for Tk was developed. The Python binding is called Tkinter, which stands for Tk interface.
+Tkinter is the default graphical toolkit for Python. It works by embedding a Tcl interpreter into the Python application.
+The Tkinter commands (written in Python) are translated into Tcl commands and then interpreted by the Tcl interpreter.
+The Tk library (and the Tkinter Python binding) allow for easy and rapid development of graphical user interfaces.
