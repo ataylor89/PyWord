@@ -68,17 +68,16 @@ The Tk library (and the Tkinter Python binding) allow for easy and rapid develop
 ## Graphical layout
 
 Normally Tk interfaces use a grid layout. The grid layout consists of cells, and each cell has coordinates
-described by a row and a column. 
+given by a row and a column. 
 
 Our Tk window has a notebook (ttk.Notebook) and a menubar (tk.Menu). 
-There is no need to specify which cells these components belong to, since the notebook takes up one cell
-and the menubar has a pre-defined position.
+The notebook takes up one cell and the menubar has a pre-defined position.
 
 We add the notebook and the menubar to our Tk window with the pack() method.
 
 The WordProcessor class subclasses the Tk class. The Tk class defines the main window of our GUI.
 
-Thus we add the ttk.Notebook object and the tk.Menu object to our WordProcessor instance.
+Thus we add the ttk.Notebook object and the tk.Menu object to our WordProcessor window.
 
 You can see that Tk makes use of object-oriented programming. 
 Many graphical toolkits make use of object-oriented programming, since it is very natural to describe
