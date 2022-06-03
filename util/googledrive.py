@@ -4,16 +4,16 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
-from util import logger
+from util import logger, config
 import os
 
+is_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
 drive_service = None
 drive_folder_id = None
 creds = None
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-def setup():
-    global drive_service, drive_folder_id
+if is_enabled:
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     if not creds or not creds.valid:

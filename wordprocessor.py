@@ -10,7 +10,6 @@ fgcolor = config.get('DEFAULT', 'foreground_color', fallback='#ffffff')
 bgcolor = config.get('DEFAULT', 'background_color', fallback='#0099ff')
 fontfamily = config.get('DEFAULT', 'font_family', fallback='Courier New')
 fontsize = config.getint('DEFAULT', 'font_size', fallback=14)
-drive_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
 
 class WordProcessor(tk.Tk):
     def __init__(self):
@@ -39,8 +38,6 @@ class WordProcessor(tk.Tk):
         self.notebook.bind('<<NotebookTabChanged>>', self.handle_tab_changed)
         self.refresh_menu_items()
         self.font = font.Font(family=fontfamily, size=fontsize)
-        if drive_enabled:
-            googledrive.setup()
 
     def new_file(self):
         text = tk.Text(self.notebook, fg=fgcolor, bg=bgcolor, font=self.font)
@@ -87,7 +84,8 @@ class WordProcessor(tk.Tk):
             self.filemenu.entryconfig("Save", state="active")
             self.colormenu.entryconfig("Select foreground", state="active")
             self.colormenu.entryconfig("Select background", state="active")
-            self.cloudmenu.entryconfig("Save to Google Drive", state="active")
+            self.cloudmenu.entryconfig("Save to Google Drive", 
+                state="active" if googledrive.is_enabled else "disabled")
         elif tabid:
             self.filemenu.entryconfig("Save", state="disabled")
             self.colormenu.entryconfig("Select foreground", state="active")
@@ -115,10 +113,9 @@ class WordProcessor(tk.Tk):
         text.configure(bg=color[1])
 
     def save_to_google_drive(self):
-        if drive_enabled:
-            tabid = self.notebook.select()
-            filename = self.notebook.tab(tabid, "text")
-            googledrive.save_file(filename)
+        tabid = self.notebook.select()
+        filename = self.notebook.tab(tabid, "text")
+        googledrive.save_file(filename)
  
 if __name__ == '__main__':
     app = WordProcessor()
