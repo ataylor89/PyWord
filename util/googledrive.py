@@ -7,12 +7,12 @@ from googleapiclient.http import MediaFileUpload
 from util import logger, config
 import os
 
-is_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
 drive_service = None
 drive_folder_id = None
 creds = None
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
+is_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
 if is_enabled:
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
