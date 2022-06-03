@@ -13,6 +13,7 @@ creds = None
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 is_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
+
 if is_enabled:
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
