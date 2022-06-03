@@ -3,81 +3,14 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import colorchooser
 from tkinter import font
-import os
-import configparser
-import logging
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
+from util import logger, config
+from util import googledrive
 
-# Get configuration options from file
-config = configparser.ConfigParser()
-config.read('wordprocessor.ini')
 fgcolor = config.get('DEFAULT', 'foreground_color', fallback='#ffffff')
 bgcolor = config.get('DEFAULT', 'background_color', fallback='#0099ff')
 fontfamily = config.get('DEFAULT', 'font_family', fallback='Courier New')
 fontsize = config.getint('DEFAULT', 'font_size', fallback=14)
 drive_enabled = config.getboolean('DEFAULT', 'drive_enabled', fallback=False)
-
-# Setup logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s;%(module)s;%(funcName)s;%(levelname)s;%(message)s")
-logger.propagate = False
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-HOME_DIR = os.environ['HOME']
-LOG_DIR = HOME_DIR + '/Logs'
-LOG_FILE = LOG_DIR + '/pyword.log'
-try:
-    if not os.path.exists(LOG_DIR):
-        os.makedirs(LOG_DIR)
-    fh = logging.FileHandler(LOG_FILE)
-    fh.setLevel(logging.INFO)
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
-except OSError as error:
-    logger.error(f'An error occurred: {error}')
-except:
-    logger.error('Error creating log file')
-logger.info("Setup logging")
-
-# Setup Google Drive support
-drive_service = None
-drive_folder_id = None
-creds = None
-SCOPES = ['https://www.googleapis.com/auth/drive']
-if drive_enabled:
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-    try:
-        drive_service = build('drive', 'v3', credentials=creds)
-        queryString = "mimeType='application/vnd.google-apps.folder' and name='WordProcessor'"
-        response = drive_service.files().list(q=queryString, spaces='drive', fields='files(id, name)').execute()
-        for folder in response.get('files', []):
-            if folder.get('name') == 'WordProcessor':
-                drive_folder_id = folder.get('id')
-                break
-        if not drive_folder_id:             
-            file_metadata = {'name': 'WordProcessor', 'mimeType': 'application/vnd.google-apps.folder'}
-            folder = drive_service.files().create(body=file_metadata, fields='id').execute()
-            if folder:
-                drive_folder_id = folder.get('id')
-    except HttpError as error:
-        logger.error(f'An error occurred: {error}')
 
 class WordProcessor(tk.Tk):
     def __init__(self):
@@ -106,6 +39,8 @@ class WordProcessor(tk.Tk):
         self.notebook.bind('<<NotebookTabChanged>>', self.handle_tab_changed)
         self.refresh_menu_items()
         self.font = font.Font(family=fontfamily, size=fontsize)
+        if drive_enabled:
+            googledrive.setup()
 
     def new_file(self):
         text = tk.Text(self.notebook, fg=fgcolor, bg=bgcolor, font=self.font)
@@ -183,34 +118,7 @@ class WordProcessor(tk.Tk):
         if drive_enabled:
             tabid = self.notebook.select()
             filename = self.notebook.tab(tabid, "text")
-            basename = os.path.basename(filename)
-            try:     
-                file_id = self.search_file_on_drive(basename)
-                if file_id:
-                    media = MediaFileUpload(filename, mimetype='text/plain')
-                    file = drive_service.files().update(fileId=file_id, media_body=media).execute()
-                    if file:
-                        logger.info('Updated %s in the WordProcessor folder on Google Drive' %filename)
-                else:                                
-                    file_metadata = {'name': basename, 'parents': [drive_folder_id]}
-                    media = MediaFileUpload(filename, mimetype='text/plain')
-                    file = drive_service.files().create(body=file_metadata, media_body=media).execute()
-                    if file:
-                        logger.info('Saved %s to the WordProcessor folder on Google Drive' %filename)
-            except HttpError as error:
-                logger.error(f'An error occurred: {error}')
-
-    def search_file_on_drive(self, filename):
-        if drive_enabled:
-            try:
-                queryString = "name='%s' and '%s' in parents" %(filename, drive_folder_id)
-                response = drive_service.files().list(q=queryString, spaces='drive', fields='files(id, name)').execute()
-                for file in response.get('files', []):
-                    if file.get('name') == filename:
-                        return file.get('id')
-            except HttpError as error:
-                logger.error(f'An error occurred: {error}')
-        return None
+            googledrive.save_file(filename)
  
 if __name__ == '__main__':
     app = WordProcessor()
