@@ -22,6 +22,22 @@ We can install the Google Drive Python dependencies with the command:
 
 More information about the Google Drive Python API can be found [here](https://developers.google.com/drive/api/quickstart/python?hl=en_US).
 
+## Getting the credentials.json file
+
+We can get the credentials.json file (needed for Google Drive support) by going to
+
+    https://console.cloud.google.com/
+
+In the top left, there is a navigation menu. Go to the navigation menu and select
+
+    APIs & Services > Credentials
+
+Click on the client ID in "OAuth 2.0 Client IDs". You should see "Client ID for Desktop" and your project name. Then, click on "Download JSON".
+
+This will download the client secret JSON file.
+
+Copy this file into the PyWord directory as credentials.json, and we're set.
+
 ## Creating a MacOS app
 
 We can create a MacOS app from the Python source code using [py2app](https://py2app.readthedocs.io/en/latest/index.html)
