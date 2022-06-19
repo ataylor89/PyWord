@@ -32,9 +32,9 @@ In the top left, there is a navigation menu. Go to the navigation menu and selec
 
     APIs & Services > Credentials
 
-Click on the client ID in "OAuth 2.0 Client IDs". You should see "Client ID for Desktop" and your project name. Then, click on "Download JSON".
+Click on the client ID in "OAuth 2.0 Client IDs". You should see "Client ID for Desktop" and your project name. 
 
-This will download the client secret JSON file.
+Then, click on "Download JSON". This will download the client secret JSON file.
 
 Copy this file into the PyWord directory as credentials.json, and we're set.
 
